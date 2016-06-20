@@ -1,0 +1,57 @@
+@relation 'Source Data'
+
+@attribute content string
+@attribute Class {positive,negative}
+
+@data
+'Gluetext is a fresh site aggregating all the news about whatever you want to one place http://www.url.com',?
+'I WANT CHOCOLATE ............... ;p',?
+'The WHITE zone is for loading and unloading ONLY . If you need to load or unload , go to the WHITE zone , youll LOVE it .',?
+'10 Steps to make the best Italian coffee in Paris - http://www.url.com',?
+'@user why what happened . boo hoo .',?
+'Im really looking forward to a catch up coffee with @user and her cool little man .',?
+'Morning world ! Guess its time to get work started ! Gaan ons !',?
+'The Stranger in My House @user http://www.url.com',?
+'Photo : Uberbyte . I wanna grow up to look like one of these fuckers . http://www.url.com',?
+'@user yo I got some white rhino in my desk right now , that shit is dank',?
+'Wishing I could sleep . Big truck day in the morning .',?
+'Space Invaders Autopsy T-Shirt - Space Invaders - Gizmodo http://www.url.com',?
+'I posted 16 photos on Facebook in the album \" AFTERNOON TEA \" http://www.url.com',?
+'AT 6:54 pm : 35.6 °C , Humidity 16\% , Wind S 13km/h , Pressure 1015.9 hPa . SO FAR : Min 22.9 °C , Max 38.9 °C , Rain nil . FCAST: @user',?
+'http://www.url.com : 3m more for Moon http://www.url.com',?
+'Artists Without Mortarboards : Should Museum Studies Go Guerrilla ? http://www.url.com',?
+'Going 2 sleep tweets .. & Somebody pls smack tha shit outta Sammy Sosa 4 doin that creepy unnecessary ass shit 2 himself b4 I wake . Pls & thx',?
+'#Vacation Our reader is charged to repair a rental car tire -- a tire she says she never damaged . When her .. http://www.url.com',?
+'head teacher given more powers : http://www.url.com they try in Germany , too',?
+'NURSERY ADMISSIONS preeti anand commented on ASs blog post  Which is better Manav Sthali or .. http://www.url.com',?
+'Someones just get out from his car and start shouting angrily and take control of this traffic . Cool .',?
+'chillin wit the homies ! yall know how it is',?
+'To help your body work like it is supposed to , you must have good nutrition http://www.url.com',?
+'just joined a video chat with 78 other people at http://www.url.com #tinychat http://www.url.com',?
+'as Im seeing more and more Bud Light boxes in my dumpster I cant help but think  there goes the neighborhood ',?
+'New Copy & Paste Article , Choosing The Right Summer Handbag - http://www.url.com',?
+'@user turn up Bonomos mic , its low :(',?
+'@user not as bad as asians LoL',?
+'Posted a new mug shot : Aundre Loverne Stevens http://www.url.com',?
+'RT @user im going to attempt to cut down on tweets and @user .',?
+'@user ha ha too true',?
+'@user hes gonna fall madly in lurv with you ! or hes totally mad ...',?
+'She say my tattoos make her pussy dripp !!! My body art run her crazy !!! MY SUPERMAN DICK DRIVE HER CRAZIER #twitterafterdark',?
+'@user FUNNY SHIT at UCB tonight yo !',?
+'almost time for bed , nite to all that care :)',?
+'Why the fuck are we out of hot fucking water at one o  fuck in the fucking morning ? DX',?
+'listening to \" Willie Nelson - Blue Eyes Crying In The Rain \" ♫ http://www.url.com',?
+'@user HAHAS , Then good for you luhh !! :D HAPPY BELATED BDAYYY : X',?
+'@user Eastern Rosellas maybe ? They were definitely parakeets , red , yellow , and green . I spotted 2 in Kingston on Monday as well .',?
+'@user I do not know this TWLC you speak of ! And its not my fault gossip girl had one , nor is it my fault my gf made me watch !',?
+'worm raceing to day just glueing on some legs . fingers x',?
+'Work from home Telecommuting jobs - http://www.url.com',?
+'serves tim good RT @user hey , @user @user @user dont miss @user  s meet up ! http://www.url.com',?
+'is awake and heading to uni for a day in the library !',?
+'NBA Unrivaled slams into Xbox Live and PSN http://www.url.com',?
+'Look4Articles Without the Best Cat Training Your House Can Turn Into Chaos : Your cat scra .. http://www.url.com Visit Us',?
+'Blk history is suppressed , distorted & ignored by the modern world , the deception of the Western establishment has failed to stamp them out',?
+'Ive been awake ;( for far too long , accomplishing far too little . Good night !',?
+'Mideast customers lead charge for $80m supersonic jet : Aviation company says region makes up 25\% of letters of inten ... http://www.url.com',?
+'If tekken was a action game with a rpg feel I would definitly cop',?
+'Bens got his modern warfare :( nightvision goggles .',?
