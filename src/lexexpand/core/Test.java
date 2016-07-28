@@ -1,23 +1,18 @@
 package lexexpand.core;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Iterator;
-import java.util.Random;
 
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibLINEAR;
 import weka.classifiers.meta.FilteredClassifier;
-import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Utils;
-import weka.experiment.PairedStats;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.DistantSupervisionFilter;
 import weka.filters.unsupervised.attribute.EmoticonDistantSupervision;
+import weka.filters.unsupervised.attribute.PTCM;
 import weka.filters.unsupervised.attribute.RemoveType;
 import weka.filters.unsupervised.attribute.ASA;
 
@@ -143,20 +138,23 @@ public class Test {
 
 		
 
-		//		SampleFromWords distFiltEx=new SampleFromWords();		
-		double centNum=Double.parseDouble(args[1]);
-
-		ASA asaFilter=new ASA();		
-		// Non mutually exclusive false			
-		asaFilter.setOptions(Utils.splitOptions("-M 1 -W -C -I 1 -P WORD- -Q CLUST- -L -J lexicons/AFINN-posneg.txt -H resources/50mpaths2.txt -T resources/stopwords.txt -O -A 10 -B "+centNum));
-
-
 		DistantSupervisionFilter	emoFilter=new EmoticonDistantSupervision();
 		emoFilter.setOptions(Utils.splitOptions("-M 1 -W -C -I 1 -P WORD- -Q CLUST- -L -H resources/50mpaths2.txt -T resources/stopwords.txt -O"));
 
+		
+
+		DistantSupervisionFilter asaFilter=new ASA();		
+		// Non mutually exclusive false			
+		asaFilter.setOptions(Utils.splitOptions("-M 1 -W -C -I 1 -P WORD- -Q CLUST- -L -J lexicons/AFINN-posneg.txt -H resources/50mpaths2.txt -T resources/stopwords.txt -O -A 10 -B 1.0"));
 
 
 
+		DistantSupervisionFilter ptcmFilter=new PTCM();		
+		// Non mutually exclusive false			
+		ptcmFilter.setOptions(Utils.splitOptions("-M 1 -W -C -I 1 -P WORD- -Q CLUST- -L -J lexicons/AFINN-posneg.txt -H resources/50mpaths2.txt -T resources/stopwords.txt -O -B 10"));
+
+		
+		
 
 
 
@@ -166,14 +164,16 @@ public class Test {
 		reader.close();
 
 
-		System.out.println("\n\n");
-
-
-
-
-		wlf.processDistFilt(sourceData, asaFilter);
-
+		System.out.println("Emoticon Results");
 		wlf.processDistFilt(sourceData, emoFilter);
+
+		System.out.println("\n\n ASA Results");
+		wlf.processDistFilt(sourceData, asaFilter);
+		
+
+		System.out.println("\n\n PTCM Results");
+		wlf.processDistFilt(sourceData, ptcmFilter);
+
 
 
 

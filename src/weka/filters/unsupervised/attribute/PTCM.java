@@ -33,18 +33,14 @@ import weka.core.Option;
 import weka.core.SparseInstance;
 import weka.core.Utils;
 import weka.core.Capabilities.Capability;
-import weka.filters.SimpleBatchFilter;
 
 public class PTCM extends DistantSupervisionFilter{
 
 	/**
 	 * 	 Given a corpus of documents creates Vector Space model for each labelled word using multiple attributes
-	 *  	 We just consider words labelled according to a lexicon
-	 *   We create multiple instances for each word by partionating the posting list
-	 *   Idea 1: Partionating I will end up having more instances for frequent words
-	 *   Idea 2: Partionaning and setting a maximum 
-	 *   Idea 3: Same number of instances per word, using sampling
-	 */ 
+	 * 	 words are represented by tweet centroids.	 
+	 *   Tweets from the second batch are mapped into sparse features. 
+	 *   	**/ 
 
 
 
@@ -74,10 +70,10 @@ public class PTCM extends DistantSupervisionFilter{
 
 	/** the index of the string attribute to be processed */
 	protected int textIndex=1; 
-	
+
 	/** the number of parititions in each centrod */
 	protected int partNumber=-1;
-	
+
 	/** the prefix of the word attributes */
 	protected String wordPrefix="WORD-";
 
@@ -102,10 +98,6 @@ public class PTCM extends DistantSupervisionFilter{
 
 	/** True for calculating cluster-based attributes . */
 	protected boolean createClustAtts=true;
-
-
-	/** True if the number of documents where the word occurs is reported. */
-	protected boolean reportNumDocs=false;
 
 
 
@@ -177,10 +169,10 @@ public class PTCM extends DistantSupervisionFilter{
 				if(i<this.postingList.size()&& i+partSize>this.postingList.size() ){
 					resList.add(this.postingList.subList(i, this.postingList.size()));
 				}
-				
+
 			}
-			
-			
+
+
 
 			return resList;
 
@@ -252,8 +244,6 @@ public class PTCM extends DistantSupervisionFilter{
 		result.addElement(new Option("\t Lowercase content.\n"
 				+ "\t(default: " + this.toLowerCase + ")", "L", 0, "-L"));
 
-		result.addElement(new Option("\t Report number of documents.\n"
-				+ "\t(default: " + this.reportNumDocs + ")", "D", 0, "-D"));
 
 		result.addElement(new Option("\t The path of the seed lexicon.\n"
 				+ "\t(default: " + this.lexPath + ")", "J", 1, "-J"));
@@ -274,11 +264,11 @@ public class PTCM extends DistantSupervisionFilter{
 		result.addElement(new Option("\t Clean tokens (replace goood by good, standarise URLs and @users).\n"
 				+ "\t(default: " + this.cleanTokens + ")", "O", 0, "-O"));
 
-		
-		result.addElement(new Option("\t The size of the partitions.\n"
-				+ "\t(default: " + this.partNumber + ")", "U", 1, "-U"));
 
-		
+		result.addElement(new Option("\t The size of the partitions.\n"
+				+ "\t(default: " + this.partNumber + ")", "B", 1, "-B"));
+
+
 
 		result.addAll(Collections.list(super.listOptions()));
 
@@ -321,8 +311,6 @@ public class PTCM extends DistantSupervisionFilter{
 		if(this.toLowerCase)
 			result.add("-L");
 
-		if(this.reportNumDocs)
-			result.add("-D");
 
 		result.add("-J");
 		result.add("" + this.getLexPath());
@@ -341,10 +329,10 @@ public class PTCM extends DistantSupervisionFilter{
 
 		if(this.isCleanTokens())
 			result.add("-O");
-		
-		result.add("-U");
+
+		result.add("-B");
 		result.add(""+this.getPartNumber());
-		
+
 
 		Collections.addAll(result, super.getOptions());
 
@@ -437,11 +425,6 @@ public class PTCM extends DistantSupervisionFilter{
 
 		this.toLowerCase=Utils.getFlag('L', options);
 
-		this.reportNumDocs=Utils.getFlag('D', options);
-
-
-
-
 
 		String lexPathOption = Utils.getOption('J', options);
 		if (lexPathOption.length() > 0) {
@@ -487,8 +470,8 @@ public class PTCM extends DistantSupervisionFilter{
 
 		this.cleanTokens=Utils.getFlag('O', options);
 
-		
-		String partNumberOption = Utils.getOption('U', options);
+
+		String partNumberOption = Utils.getOption('B', options);
 		if (textIndexOption.length() > 0) {
 			String[] partNumberSpec = Utils.splitOptions(partNumberOption);
 			if (partNumberSpec.length == 0) {
@@ -499,8 +482,8 @@ public class PTCM extends DistantSupervisionFilter{
 			this.setPartNumber(partNumberValue);
 
 		}
-		
-		
+
+
 
 
 		super.setOptions(options);
@@ -665,10 +648,11 @@ public class PTCM extends DistantSupervisionFilter{
 			}
 
 
-
-			int wordNameIndex=result.attribute("WORD_NAME").index();
-			values[wordNameIndex]=result.attribute(wordNameIndex).addStringValue(content);	
-
+			if(this.isReportWord()){
+				int wordNameIndex=result.attribute("WORD_NAME").index();
+				values[wordNameIndex]=result.attribute(wordNameIndex).addStringValue(content);			
+			}
+			
 			Instance outInst=new SparseInstance(1, values);
 
 			inst.setDataset(result);
@@ -717,7 +701,7 @@ public class PTCM extends DistantSupervisionFilter{
 	public void computeWordVecsAndVoc(Instances inputFormat) {
 
 		this.lex = new LexiconEvaluator(	this.lexPath);
-		
+
 		try {
 			this.lex.processDict();
 		} catch (IOException e1) {
@@ -813,9 +797,9 @@ public class PTCM extends DistantSupervisionFilter{
 
 
 					String value=this.lex.retrieveValue(word);
-										
+
 					if(value.equals("positive")||value.equals("negative")){
-							
+
 						if (this.wordInfo.containsKey(word)) {
 							WordRep wordRep=this.wordInfo.get(word);
 							wordRep.addDoc(docVec); // add the document
@@ -861,10 +845,6 @@ public class PTCM extends DistantSupervisionFilter{
 		}
 
 
-		// add the number of documents as an attribute
-		if(this.reportNumDocs)
-			att.add(new Attribute("NUM_DOCS"));
-
 		// we add the word name as an attribute
 		if(this.reportWord)
 			att.add(new Attribute("WORD_NAME", (ArrayList<String>) null));
@@ -891,81 +871,88 @@ public class PTCM extends DistantSupervisionFilter{
 
 
 
-		Instances result = getOutputFormat();
-		
-		
-
-		for(String word:this.wordInfo.keySet()){
-			// get the word vector
-			WordRep wordRep=this.wordInfo.get(word);
-
-			// We just consider valid words
-			if(wordRep.numDoc>=this.minInstDocs){
-
-				// a list of lists of tweet vectors
-				ObjectList<ObjectList<Object2IntMap<String>>> partitions=wordRep.partitionate(this.getPartNumber());
-				
-				// traverse the partitions
-				for(ObjectList<Object2IntMap<String>> tweetPartition:partitions){
-
-					// create one instance per partition	
-					double[] values = new double[result.numAttributes()];
+		Instances result;
 
 
-					// average the vectors of the tweets in the partition
-					// traverse each feature space in the partition
-					for(Object2IntMap<String> wordSpace:tweetPartition){
+		if(!this.isFirstBatchDone()){
+			result = getOutputFormat();
 
-						for(String innerWord:wordSpace.keySet()){
-							// only include valid words
-							if(this.m_Dictionary.containsKey(innerWord)){
-								int attIndex=this.m_Dictionary.getInt(innerWord);
-								// we normalise the value by the number of documents
-								values[attIndex]+=((double)wordSpace.getInt(innerWord))/tweetPartition.size();					
+
+
+			for(String word:this.wordInfo.keySet()){
+				// get the word vector
+				WordRep wordRep=this.wordInfo.get(word);
+
+				// We just consider valid words
+				if(wordRep.numDoc>=this.minInstDocs){
+
+					// a list of lists of tweet vectors
+					ObjectList<ObjectList<Object2IntMap<String>>> partitions=wordRep.partitionate(this.getPartNumber());
+
+					// traverse the partitions
+					for(ObjectList<Object2IntMap<String>> tweetPartition:partitions){
+
+						// create one instance per partition	
+						double[] values = new double[result.numAttributes()];
+
+
+						// average the vectors of the tweets in the partition
+						// traverse each feature space in the partition
+						for(Object2IntMap<String> wordSpace:tweetPartition){
+
+							for(String innerWord:wordSpace.keySet()){
+								// only include valid words
+								if(this.m_Dictionary.containsKey(innerWord)){
+									int attIndex=this.m_Dictionary.getInt(innerWord);
+									// we normalise the value by the number of documents
+									values[attIndex]+=((double)wordSpace.getInt(innerWord))/tweetPartition.size();					
+								}
 							}
 						}
+
+
+						if(this.reportWord){
+							int wordNameIndex=result.attribute("WORD_NAME").index();
+							values[wordNameIndex]=result.attribute(wordNameIndex).addStringValue(word);					
+						}
+
+
+						String wordPol=this.lex.retrieveValue(word);
+						if(wordPol.equals("negative"))
+							values[result.numAttributes()-1]=0;
+						else if(wordPol.equals("positive"))
+							values[result.numAttributes()-1]=1;
+						else
+							values[result.numAttributes()-1]= Utils.missingValue();					
+
+
+
+						Instance inst=new SparseInstance(1, values);
+
+
+						inst.setDataset(result);
+
+						result.add(inst);
+
+
+
+
 					}
-
-
-					if(this.reportNumDocs)
-						values[result.numAttributes()-3]=wordRep.numDoc;
-
-					if(this.reportWord){
-						int wordNameIndex=result.attribute("WORD_NAME").index();
-						values[wordNameIndex]=result.attribute(wordNameIndex).addStringValue(word);					
-					}
-
-
-					String wordPol=this.lex.retrieveValue(word);
-					if(wordPol.equals("negative"))
-						values[result.numAttributes()-1]=0;
-					else if(wordPol.equals("positive"))
-						values[result.numAttributes()-1]=1;
-					else
-						values[result.numAttributes()-1]= Utils.missingValue();					
-
-
-
-					Instance inst=new SparseInstance(1, values);
-
-
-					inst.setDataset(result);
-
-					result.add(inst);
-
 
 
 
 				}
 
 
-
 			}
-
-
 		}
 
 
+		// Second batch maps tweets into the corresponding feature space
+		else{
+			result=this.mapTargetInstance(instances);
+			
+		}
 
 		return result;
 
@@ -1073,18 +1060,6 @@ public class PTCM extends DistantSupervisionFilter{
 
 
 
-
-	public boolean isReportNumDocs() {
-		return reportNumDocs;
-	}
-
-
-
-	public void setReportNumDocs(boolean reportNumDocs) {
-		this.reportNumDocs = reportNumDocs;
-	}
-
-
 	public String getLexPath() {
 		return lexPath;
 	}
@@ -1155,7 +1130,7 @@ public class PTCM extends DistantSupervisionFilter{
 		this.cleanTokens = cleanTokens;
 	}
 
-	
+
 
 	public int getPartNumber() {
 		return partNumber;
